@@ -4,7 +4,9 @@ import React from 'react'
 
 const Login = () => {
   return (
-    <LoginForm />
+    <div className='flex justify-center mb-4'>
+      <LoginForm />
+    </div>
   )
 }
 

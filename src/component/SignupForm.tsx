@@ -134,13 +134,13 @@ const SignupForm = () => {
             !validatePassword(password)
           }
           name="create account"
-        >
-          
-        </Button>
+        />
       </form>
       <div className="text-center">
-        <span>Have an Account?  </span>
-        <Link href="/login" className="uppercase font-medium">Login</Link>
+        <span>Have an Account? </span>
+        <Link href="/login" className="font-medium uppercase">
+          Login
+        </Link>
       </div>
     </div>
   );

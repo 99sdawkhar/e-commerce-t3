@@ -23,8 +23,8 @@ const Header = ({ user }: IHeader) => {
 
   return (
     <header>
-      <div className="wrapper px-10 mb-4">
-        <div className="flex items-center justify-end gap-5 mb-4">
+      <div className="wrapper mb-4 px-10">
+        <div className="mb-4 flex items-center justify-end gap-5">
           <ul className="flex gap-5">
             {header.support.map((item) => (
               <li key={item.id}>
@@ -42,21 +42,24 @@ const Header = ({ user }: IHeader) => {
             <div>Hi {user?.name}</div>
           </div>
         </div>
-        <div className="flex justify-between items-center">
-          <h1 className="uppercase text-3xl font-bold">{header.logo}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold uppercase">{header.logo}</h1>
           <nav>
-            <ul className="flex gap-5 font-semibold items-center">
+            <ul className="flex items-center gap-5 font-semibold">
               {header.nav.map((item) => (
-                <li key={item.id} className="hover:text-slate-700 hover:underline">
+                <li
+                  key={item.id}
+                  className="hover:text-slate-700 hover:underline"
+                >
                   <Link href={item.link}>{item.name}</Link>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className="flex gap-5 items-center">
+          <div className="flex items-center gap-5">
             {header.addtionalDetails.map((item) => (
               <div key={item.id}>
-                <item.icon className="w-5 h-5" />
+                <item.icon className="h-5 w-5" />
               </div>
             ))}
           </div>

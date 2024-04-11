@@ -1,3 +1,4 @@
+import Button from "@/component/Button";
 import { api } from "@/utils/api";
 import { ERoutes } from "@/utils/enum";
 import { maskEmail } from "@/utils/utils";
@@ -6,9 +7,9 @@ import React, { useRef, useState } from "react";
 
 const VerifyAccount = () => {
   const router = useRouter();
-  const utils = api.useContext();
 
   const [codes, setCodes] = useState<string[]>(Array(8).fill(""));
+  const [error, setError] = useState<string>("");
 
   const inputsRefs = Array.from({ length: 8 }, () =>
     useRef<HTMLInputElement>(null),
@@ -50,7 +51,7 @@ const VerifyAccount = () => {
       router.push(ERoutes.home);
     },
     onError: (error) => {
-      console.error(error?.shape?.message);
+      setError(error?.shape?.message ?? "");
     },
   });
 
@@ -64,35 +65,48 @@ const VerifyAccount = () => {
 
   const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    userVerification()
+    userVerification();
   };
 
   return (
-    <div className="h-screen">
-      <h1>Verify your email</h1>
-      <p>Enter the 8 digit code you have received on </p>
-      <div>{maskEmail("99sdawkhar@gmail.com")}</div>
-      <form className="" method="post" onSubmit={handleVerify}>
-        <span>Code</span>
-        <div className="flex space-x-4">
-          {codes.map((code, index) => (
-            <fieldset key={index}>
-              <input
-                ref={inputsRefs[index]}
-                type="text"
-                maxLength={1}
-                value={code}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="h-10 w-10 rounded border border-gray-300 text-center focus:border-blue-500 focus:outline-none"
-              />
-            </fieldset>
-          ))}
+    <div className="mb-4 flex justify-center">
+      <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
+        <h2 className="mb-8 text-center text-2xl font-semibold">
+          Verify your email
+        </h2>
+        <p className="text-center ">
+          Enter the 8 digit code you have received on{" "}
+        </p>
+        <div className="text-center font-medium">
+          {maskEmail("99sdawkhar@gmail.com")}
         </div>
-        <button type="submit" disabled={isVerifyDisabled}>
-          Verify
-        </button>
-      </form>
+        <form className="max-w-[576px]" method="post" onSubmit={handleVerify}>
+          <span>Code</span>
+          <div className="flex space-x-4">
+            {codes.map((code, index) => (
+              <fieldset
+                key={index}
+                className="relative flex max-w-[450px] flex-col"
+              >
+                <input
+                  ref={inputsRefs[index]}
+                  type="text"
+                  maxLength={1}
+                  value={code}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  className="h-10 w-10 rounded border border-gray-300 text-center focus:border-blue-500 focus:outline-none"
+                />
+              </fieldset>
+            ))}
+          </div>
+          {error && (
+            <span className="mb-6 inline-block text-red-600">{error}</span>
+          )}
+
+          <Button type="submit" disabled={isVerifyDisabled} name="Verify" />
+        </form>
+      </div>
     </div>
   );
 };

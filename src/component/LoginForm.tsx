@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { setCookie } from 'nookies'; // Assuming you're using Next.js
-
+import { setCookie } from "nookies"; // Assuming you're using Next.js
 import Input from "./Input";
-import { validateEmail, validateName, validatePassword } from "@/utils/utils";
+import { validateEmail, validatePassword } from "@/utils/utils";
 import { api } from "@/utils/api";
 import { ERoutes } from "@/utils/enum";
+import Button from "./Button";
 
 const LoginForm = () => {
   const router = useRouter();
-  // const utils = api.useContext();
-
-  // get userName List
-  // const { data: exsitingEmailList } = api.user.getExistingEmails.useQuery();
 
   const initialState = {
     email: "",
@@ -25,6 +21,11 @@ const LoginForm = () => {
     email?: string;
     password?: string;
   }>(initialState);
+
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  const handlePasswordVisibilityChange = () =>
+    setIsVisible((prev: boolean) => !prev);
 
   const { email, password } = user;
 
@@ -41,9 +42,9 @@ const LoginForm = () => {
   const login = api.user.loginUser.useMutation({
     onSuccess: (data) => {
       const { token } = data;
-      setCookie(null, 'token', token, {
+      setCookie(null, "token", token, {
         maxAge: 3600,
-        path: '/', // Cookie is accessible from all paths
+        path: "/", // Cookie is accessible from all paths
       });
 
       router.push(ERoutes.home);
@@ -51,11 +52,11 @@ const LoginForm = () => {
       setError(initialState);
     },
     onError: (error) => {
-      const errMsg = error?.shape?.message
+      const errMsg = error?.shape?.message;
       setError({
         ...error,
-        password: errMsg ?? ""
-      })
+        password: errMsg ?? "",
+      });
       console.error(error?.shape?.message);
     },
   });
@@ -69,37 +70,21 @@ const LoginForm = () => {
     return newUser;
   };
 
-  const isFilledFormValid = () => {
-    // let emailError = "";
-
-    // const emailExists =
-    //   Array.isArray(exsitingEmailList) &&
-    //   exsitingEmailList.length > 0 &&
-    //   exsitingEmailList.find((item) => item.toLocaleLowerCase() === email);
-    // if (emailExists) {
-    //   emailError = "The email you entered is already exist.";
-    // }
-
-    // if (emailError) {
-      // setError({
-      //   ...error,
-      //   email: emailError,
-      // });
-      return false;
-    // }
-    return true;
-  };
-
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // if (isFilledFormValid()) {
-      loginUser();
-    // }
+    loginUser();
   };
 
   return (
-    <div>
-      <form onSubmit={handleLogin} method="post">
+    <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
+      <h2 className="mb-8 text-center text-2xl font-semibold">Login</h2>
+      <h3 className="mb-3 text-center text-lg font-medium">
+        Welcome back to ECOMMERCE
+      </h3>
+      <p className="mb-5 text-center text-sm">
+        The next gen business marketplace
+      </p>
+      <form onSubmit={handleLogin} method="post" className="max-w-[576px]">
         <Input
           label="Email"
           type="email"
@@ -111,26 +96,33 @@ const LoginForm = () => {
         />
         <Input
           label="Password"
-          type="password"
+          type={isVisible ? "text" : "password"}
+          extraData={
+            <span
+              className="absolute bottom-0 right-0 block -translate-x-2/4 -translate-y-2/4 cursor-pointer underline"
+              onClick={handlePasswordVisibilityChange}
+            >
+              {isVisible ? "Hide" : "Show"}
+            </span>
+          }
           name="password"
           value={password}
           handleChange={handleChange}
           placeholder="Enter"
           error={error.password}
         />
-        <button
+
+        <Button
           type="submit"
-          disabled={
-            !validateEmail(email) ||
-            !validatePassword(password)
-          }
-        >
-          Login
-        </button>
+          disabled={!validateEmail(email) || !validatePassword(password)}
+          name="login"
+        />
       </form>
-      <div>
-        <span>Don't have an Account?</span>
-        <Link href={ERoutes.signUp}>Sign up</Link>
+      <div className="text-center">
+        <span>Don't have an Account? </span>
+        <Link href={ERoutes.signUp} className="font-medium uppercase">
+          Sign up
+        </Link>
       </div>
     </div>
   );

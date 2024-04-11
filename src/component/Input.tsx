@@ -11,11 +11,10 @@ interface IInput {
   onKeyDown?: (e: any) => void;
   classes?: string;
   error?: string;
+  extraData?: React.ReactNode;
 }
 
-const Input = (
-  props: IInput
-) => {
+const Input = (props: IInput) => {
   const {
     label,
     name,
@@ -25,11 +24,16 @@ const Input = (
     handleChange,
     onKeyDown,
     error,
-    classes
+    classes,
+    extraData,
   } = props;
   return (
-    <fieldset className="flex flex-col max-w-[450px] mb-6">
-      {label && <label htmlFor={name} className="mb-1">{label}</label>}
+    <fieldset className="relative mb-6 flex max-w-[450px] flex-col">
+      {label && (
+        <label htmlFor={name} className="mb-1">
+          {label}
+        </label>
+      )}
       <input
         type={type}
         id={name}
@@ -38,8 +42,12 @@ const Input = (
         onChange={handleChange}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className={cn('flex border border-[#C1C1C1] rounded-md mb-1 py-1.5 px-2', classes)}
+        className={cn(
+          "mb-1 flex rounded-md border border-[#C1C1C1] p-2",
+          classes,
+        )}
       />
+      {extraData}
       {error && <span className="text-red-600">{error}</span>}
     </fieldset>
   );
