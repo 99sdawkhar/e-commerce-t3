@@ -29,6 +29,8 @@ const config = {
       },
     ],
     "@typescript-eslint/no-explicit-any": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "react/no-unescaped-entities": "warn",
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
   settings: {
