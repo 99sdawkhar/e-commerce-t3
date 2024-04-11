@@ -1,17 +1,13 @@
-import Head from "next/head";
-import Link from "next/link";
+import { withAuth } from "@/hoc/withAuth";
 
-import { api } from "@/utils/api";
-
-export default function Home() {
-  // const hello = api.post.hello.useQuery({ text: "from tRPC" });
-
+const Home = () => {
   return (
     <>
-      
       <main className="flex min-h-screen flex-col items-center justify-center">
-
+        Home
       </main>
     </>
   );
-}
+};
+
+export default withAuth(Home);

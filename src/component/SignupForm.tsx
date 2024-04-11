@@ -1,10 +1,16 @@
-import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { setCookie } from "nookies"; // Assuming you're using Next.js
+
 import Input from "./Input";
 import { validateEmail, validateName, validatePassword } from "@/utils/utils";
 import { api } from "@/utils/api";
+import { ERoutes } from "@/utils/enum";
+import Button from "./Button";
 
 const SignupForm = () => {
+  const router = useRouter();
   const utils = api.useContext();
 
   // get userName List
@@ -14,7 +20,7 @@ const SignupForm = () => {
     name: "",
     email: "",
     password: "",
-  }
+  };
 
   const [signUpForm, setSignUpForm] = useState(initialState);
   const [error, setError] = useState(initialState);
@@ -33,13 +39,19 @@ const SignupForm = () => {
 
   const creatUser = api.user.createUser.useMutation({
     onSuccess: (data) => {
-      // router.push("/" + data.profile.username);
+      const { token } = data;
+      setCookie(null, "token", token, {
+        maxAge: 3600,
+        path: "/",
+      });
+
+      router.push(ERoutes.verifyAccount);
       setSignUpForm(initialState);
       setError(initialState);
       utils.user.getExistingEmails.invalidate(); // revalidate once we have new registered user so that we can get udpated email list
     },
     onError: (error) => {
-      console.error({error});
+      console.error({ error });
     },
   });
 
@@ -54,33 +66,39 @@ const SignupForm = () => {
   };
 
   const isFilledFormValid = () => {
-    let emailError = '';
+    let emailError = "";
 
-    const emailExists = Array.isArray(exsitingEmailList) && exsitingEmailList.length > 0 && exsitingEmailList.find((item) => item.toLocaleLowerCase() === email);
+    const emailExists =
+      Array.isArray(exsitingEmailList) &&
+      exsitingEmailList.length > 0 &&
+      exsitingEmailList.find((item) => item.toLocaleLowerCase() === email);
     if (emailExists) {
-      emailError = 'The email you entered is already exist.'
+      emailError = "The email you entered is already exist.";
     }
 
     if (emailError) {
-      setError({ 
+      setError({
         ...error,
-        email: emailError
+        email: emailError,
       });
-       return false;
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isFilledFormValid()) {
-      registerUser()
+      registerUser();
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} method="post">
+    <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
+      <h2 className="mb-8 text-center text-2xl font-semibold">
+        Create your account
+      </h2>
+      <form onSubmit={handleSubmit} method="post" className="max-w-[576px]">
         <Input
           label="Name"
           type="text"
@@ -108,13 +126,21 @@ const SignupForm = () => {
           placeholder="Enter"
           error={error.password}
         />
-        <button type="submit" disabled={!validateName(name) || !validateEmail(email) || !validatePassword(password)}>
-          create account
-        </button>
+        <Button
+          type="submit"
+          disabled={
+            !validateName(name) ||
+            !validateEmail(email) ||
+            !validatePassword(password)
+          }
+          name="create account"
+        >
+          
+        </Button>
       </form>
-      <div>
-        <span>Have an Account?</span>
-        <Link href="/login">Login</Link>
+      <div className="text-center">
+        <span>Have an Account?  </span>
+        <Link href="/login" className="uppercase font-medium">Login</Link>
       </div>
     </div>
   );
