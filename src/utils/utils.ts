@@ -13,3 +13,15 @@ export const validatePassword = (pass: string) => {
   const re = /^[^<>]{8,16}$/;
   return re.test(pass.trim());
 };
+
+export const generateVerificationCode = () => {
+  return Number(Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8));
+};
+
+// Function to mask email
+export const maskEmail = (email: string) => {
+  const [prefix = '', suffix = ''] = email.split('@');
+  const total = prefix.length - 3
+  const maskedPrefix = prefix?.slice(0, 3) + '*'.repeat(total)
+  return maskedPrefix + '@' + suffix;
+};

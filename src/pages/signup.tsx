@@ -1,12 +1,12 @@
 import SignupForm from '@/component/SignupForm';
+import { withAuth } from '@/hoc/withAuth';
 
 const Signup = () => {
-
   return (
-    <div>
-        <SignupForm />
+    <div className='flex justify-center mb-4'>
+      <SignupForm />
     </div>
   );
 };
 
-export default Signup;
+export default withAuth(Signup);
