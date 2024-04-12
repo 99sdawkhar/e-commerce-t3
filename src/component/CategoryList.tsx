@@ -35,7 +35,7 @@ const CategoryList = ({ currentPage, items, user }: ICategoryList) => {
       handleCategoryUpdate(categoryId);
     };
   
-    return items.slice(startIndex, endIndex).map((item) => (
+    return items.slice(startIndex, endIndex).map((item: any) => (
       <div key={item.id}>
         <Input
           rightLabel={item.name}
@@ -43,7 +43,7 @@ const CategoryList = ({ currentPage, items, user }: ICategoryList) => {
           name={item.name}
           checked={
             user?.Categories &&
-            user?.Categories.find((category) => category.id === item?.id)
+            user?.Categories.find((category: any) => category.id === item?.id)
               ? true
               : false
           }
