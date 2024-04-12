@@ -55,7 +55,9 @@ const Header = () => {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold uppercase">{header.logo}</h1>
+          <h1 className="text-3xl font-bold uppercase">
+            <Link href={ERoutes.home}>{header.logo}</Link>
+          </h1>
           <nav>
             <ul className="flex items-center gap-5 font-semibold">
               {header.nav.map((item) => (

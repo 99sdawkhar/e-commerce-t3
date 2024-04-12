@@ -17,10 +17,14 @@ const CategoryList = ({ currentPage, items, user }: ICategoryList) => {
   
     const updateCategoryList = api.user.toggleCategory.useMutation({
       onError: (error) => {
-        toast.error(error?.message ?? '')
+        toast.error(error?.message ?? '', {
+          id: 'error'
+        })
       },
       onSuccess: (data) => {
-        toast.success(data?.message ?? '')
+        toast.success(data?.message ?? '', {
+          id: 'success'
+        })
         utils.user.getUserByToken.invalidate();
       },
     });
@@ -35,7 +39,7 @@ const CategoryList = ({ currentPage, items, user }: ICategoryList) => {
       handleCategoryUpdate(categoryId);
     };
   
-    return items.slice(startIndex, endIndex).map((item: any) => (
+    return items.length > 0 ? items.slice(startIndex, endIndex).map((item: any) => (
       <div key={item.id}>
         <Input
           rightLabel={item.name}
@@ -53,7 +57,9 @@ const CategoryList = ({ currentPage, items, user }: ICategoryList) => {
           classes="w-4 h-4 text-black-600 bg-gray-100 border-gray-300 rounded focus:ring-black-500 dark:focus:ring-black-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
         />
       </div>
-    ));
+    )): (
+      <div>No categories present at the moment.</div>
+    );
   };
 
   export default CategoryList
