@@ -16,7 +16,7 @@ const Layout = ({ children }: LayoutProps) => {
         <meta name="robots" content="noindex, nofollow" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header user={{ name: "Shubham" }} />
+      <Header />
       <Marquee />
       <main>{children}</main>
     </>
