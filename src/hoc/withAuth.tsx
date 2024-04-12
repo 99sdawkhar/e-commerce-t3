@@ -6,21 +6,23 @@ import useAuthenticated from "@/hooks/useAuthenticated";
 export const withAuth = (WrappedComponent: React.ComponentType) => {
   const AuthenticatedComponent: React.FC = (props) => {
     const router = useRouter();
-    const token = useAuthenticated();
+    const { isAuthenticated } = useAuthenticated();
 
     useEffect(() => {
       const routeUpdates = () => {
         switch (router.route) {
           case ERoutes.login:
-            return token && router.push(ERoutes.home);
+            return isAuthenticated && router.push(ERoutes.home);
           case ERoutes.signUp:
-            return token && router.push(ERoutes.home);
+            return isAuthenticated && router.push(ERoutes.home);
+          case ERoutes.generate:
           case ERoutes.home:
-            return !token && router.push(ERoutes.login);
+          case ERoutes.verifyAccount:
+            return !isAuthenticated && router.push(ERoutes.login);
         }
       };
       routeUpdates();
-    }, [token]);
+    }, [isAuthenticated]);
 
     return <WrappedComponent {...props} />;
   };

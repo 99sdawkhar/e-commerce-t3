@@ -6,9 +6,10 @@ interface IButton {
   type: "submit" | "reset" | "button";
   disabled?: boolean;
   name: string;
+  onClick?: () => void;
 }
 
-const Button = ({ type, disabled, classes, name }: IButton) => {
+const Button = ({ type, disabled, classes, name, onClick }: IButton) => {
   return (
     <button
       type={type}
@@ -18,6 +19,7 @@ const Button = ({ type, disabled, classes, name }: IButton) => {
         disabled && "disabled",
         classes,
       )}
+      onClick={onClick}
     >
       {name}
     </button>

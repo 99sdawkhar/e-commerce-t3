@@ -8,6 +8,8 @@ import { validateEmail, validateName, validatePassword } from "@/utils/utils";
 import { api } from "@/utils/api";
 import { ERoutes } from "@/utils/enum";
 import Button from "./Button";
+import toast from "react-hot-toast";
+import Loader from "./Loader";
 
 const SignupForm = () => {
   const router = useRouter();
@@ -37,26 +39,28 @@ const SignupForm = () => {
     setSignUpForm(formDetails);
   };
 
-  const creatUser = api.user.createUser.useMutation({
+  const { mutate, isPending } = api.user.createUser.useMutation({
     onSuccess: (data) => {
       const { token } = data;
       setCookie(null, "token", token, {
         maxAge: 3600,
         path: "/",
       });
-
+      
       router.push(ERoutes.verifyAccount);
       setSignUpForm(initialState);
       setError(initialState);
       utils.user.getExistingEmails.invalidate(); // revalidate once we have new registered user so that we can get udpated email list
     },
     onError: (error) => {
-      console.error({ error });
+      toast.error(error.message, {
+        id: 'error',
+      });
     },
   });
 
   const registerUser = () => {
-    const newUser = creatUser.mutate({
+    const newUser = mutate({
       name: name,
       email: email,
       password: password,
@@ -92,6 +96,10 @@ const SignupForm = () => {
       registerUser();
     }
   };
+
+  if (isPending) {
+    return <Loader />
+  }
 
   return (
     <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
@@ -138,7 +146,7 @@ const SignupForm = () => {
       </form>
       <div className="text-center">
         <span>Have an Account? </span>
-        <Link href="/login" className="font-medium uppercase">
+        <Link href="/login" className="font-medium uppercase hover:underline hover:text-slate-700">
           Login
         </Link>
       </div>

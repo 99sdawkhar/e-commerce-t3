@@ -7,6 +7,7 @@ import { validateEmail, validatePassword } from "@/utils/utils";
 import { api } from "@/utils/api";
 import { ERoutes } from "@/utils/enum";
 import Button from "./Button";
+import Loader from "./Loader";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -39,7 +40,7 @@ const LoginForm = () => {
     setUser(formDetails);
   };
 
-  const login = api.user.loginUser.useMutation({
+  const { mutate, isPending } = api.user.loginUser.useMutation({
     onSuccess: (data) => {
       const { token } = data;
       setCookie(null, "token", token, {
@@ -57,12 +58,11 @@ const LoginForm = () => {
         ...error,
         password: errMsg ?? "",
       });
-      console.error(error?.shape?.message);
     },
   });
 
   const loginUser = () => {
-    const newUser = login.mutate({
+    const newUser = mutate({
       email: email,
       password: password,
     });
@@ -74,6 +74,10 @@ const LoginForm = () => {
     e.preventDefault();
     loginUser();
   };
+
+  if (isPending) {
+    return <Loader />
+  }
 
   return (
     <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
@@ -120,7 +124,7 @@ const LoginForm = () => {
       </form>
       <div className="text-center">
         <span>Don't have an Account? </span>
-        <Link href={ERoutes.signUp} className="font-medium uppercase">
+        <Link href={ERoutes.signUp} className="font-medium uppercase hover:underline hover:text-slate-700">
           Sign up
         </Link>
       </div>

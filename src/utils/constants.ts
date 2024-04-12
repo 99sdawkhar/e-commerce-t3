@@ -56,3 +56,5 @@ export const header = {
         },
     ]
 }
+
+export const itemsPerPage = 6;

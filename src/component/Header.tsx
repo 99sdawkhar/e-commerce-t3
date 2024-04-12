@@ -1,4 +1,5 @@
 import useAuthenticated from "@/hooks/useAuthenticated";
+import { api } from "@/utils/api";
 import { header } from "@/utils/constants";
 import { ERoutes } from "@/utils/enum";
 import Link from "next/link";
@@ -6,15 +7,10 @@ import { useRouter } from "next/router";
 import { destroyCookie } from "nookies";
 import React from "react";
 
-interface IHeader {
-  user: {
-    name: string;
-  };
-}
-
-const Header = ({ user }: IHeader) => {
-  const token = useAuthenticated();
+const Header = () => {
   const router = useRouter();
+  
+  const { isAuthenticated, user, } = useAuthenticated();
 
   const handleLogout = () => {
     destroyCookie(null, "token");
@@ -23,23 +19,39 @@ const Header = ({ user }: IHeader) => {
 
   return (
     <header>
-      <div className="wrapper mb-4 px-10">
+      <div className="mb-4 px-10">
         <div className="mb-4 flex items-center justify-end gap-5">
+          <div className="flex gap-5">
+          {isAuthenticated ? (
+              <div className="flex gap-5">
+                <button
+                  onClick={handleLogout}
+                  className="text-black hover:text-slate-700 hover:underline"
+                  >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href={ERoutes.login}
+                className="text-black hover:text-slate-700 hover:underline"
+              >
+                Login
+              </Link>
+            )}
+          </div>
           <ul className="flex gap-5">
             {header.support.map((item) => (
-              <li key={item.id}>
+              <li
+                key={item.id}
+                className="text-black hover:text-slate-700 hover:underline"
+              >
                 <Link href={item.link}>{item.name}</Link>
               </li>
             ))}
           </ul>
           <div className="flex gap-5">
-            {token && (
-              <div>
-                <button onClick={handleLogout}>Logout</button>
-              </div>
-            )}
-            {!token && <Link href={ERoutes.login}>Login</Link>}
-            <div>Hi {user?.name}</div>
+          {isAuthenticated && <span>Hi, {user?.name}</span>}
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -56,13 +68,13 @@ const Header = ({ user }: IHeader) => {
               ))}
             </ul>
           </nav>
-          <div className="flex items-center gap-5">
+          <ul className="flex items-center gap-5">
             {header.addtionalDetails.map((item) => (
-              <div key={item.id}>
+              <li key={item.id}>
                 <item.icon className="h-5 w-5" />
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </header>

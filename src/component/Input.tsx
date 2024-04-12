@@ -3,13 +3,16 @@ import React from "react";
 
 interface IInput {
   label?: string;
+  rightLabel?: string;
   name: string;
+  checked?: boolean;
   type: string;
-  placeholder: string;
-  value: string;
-  handleChange: (e: any) => void;
+  placeholder?: string;
+  value?: string;
+  handleChange?: (e: any) => void;
   onKeyDown?: (e: any) => void;
   classes?: string;
+  parentClass?: string;
   error?: string;
   extraData?: React.ReactNode;
 }
@@ -17,7 +20,9 @@ interface IInput {
 const Input = (props: IInput) => {
   const {
     label,
+    rightLabel,
     name,
+    checked,
     type,
     placeholder,
     value,
@@ -25,10 +30,11 @@ const Input = (props: IInput) => {
     onKeyDown,
     error,
     classes,
+    parentClass,
     extraData,
   } = props;
   return (
-    <fieldset className="relative mb-6 flex max-w-[450px] flex-col">
+    <fieldset className={cn("relative mb-6 flex max-w-[450px] flex-col", parentClass)}>
       {label && (
         <label htmlFor={name} className="mb-1">
           {label}
@@ -38,6 +44,7 @@ const Input = (props: IInput) => {
         type={type}
         id={name}
         name={name}
+        checked={checked}
         value={value}
         onChange={handleChange}
         onKeyDown={onKeyDown}
@@ -47,6 +54,11 @@ const Input = (props: IInput) => {
           classes,
         )}
       />
+      {rightLabel && (
+        <label htmlFor={name} className="mb-1">
+          {rightLabel}
+        </label>
+      )}
       {extraData}
       {error && <span className="text-red-600">{error}</span>}
     </fieldset>

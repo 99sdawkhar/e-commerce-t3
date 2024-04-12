@@ -1,4 +1,4 @@
-import LoginForm from '@/component/loginForm'
+import LoginForm from '@/component/LoginForm'
 import { withAuth } from '@/hoc/withAuth'
 import React from 'react'
 

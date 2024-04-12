@@ -16,6 +16,7 @@ import { ZodError } from "zod";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { db } from "@/server/db";
 import { env } from "@/env";
+import { decodeJwt } from "@/utils/jwt";
 
 const JWT_SECRET = env.JWT_SECRET;
 
@@ -57,7 +58,7 @@ const getUserFromHeader = async (req: NextApiRequest) => {
   const token = req.cookies.token || null;
 
   if (token) {
-    const decodedToken = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decodedToken = decodeJwt(token);
 
     return decodedToken;
   }

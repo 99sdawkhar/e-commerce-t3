@@ -8,7 +8,6 @@ import { compare, hash } from "bcrypt";
 import { generateVerificationCode } from "@/utils/utils";
 import jwt from "jsonwebtoken";
 import { env } from "@/env";
-import { setCookie } from "nookies";
 
 const JWT_SECRET = env.JWT_SECRET;
 
@@ -30,7 +29,7 @@ export const userRouter = createTRPCRouter({
         },
         select: {
           email: true,
-        }
+        },
       });
 
       if (userExist) {
@@ -45,7 +44,6 @@ export const userRouter = createTRPCRouter({
 
       const hashedPassword = await hash(input.password, 10);
       const verificationCode = generateVerificationCode();
-      // const isPasswordValid = await compare(password, user.password);
 
       try {
         const response = await fetch("http://localhost:3000/api/send", {
@@ -58,6 +56,8 @@ export const userRouter = createTRPCRouter({
             code: verificationCode,
           }),
         });
+
+        console.log({response})
       } catch (err) {
         console.log({ err });
       }
@@ -85,6 +85,7 @@ export const userRouter = createTRPCRouter({
       return {
         user,
         token,
+        message: "Please verify your account.",
       };
     }),
   getExistingEmails: publicProcedure.query(async ({ ctx }) => {
@@ -102,6 +103,92 @@ export const userRouter = createTRPCRouter({
     const emailList = response.map((item) => item.email);
 
     return emailList;
+  }),
+  getUserByToken: protectedProcedure
+    .input(z.object({}))
+    .query(async ({ ctx }) => {
+      const tokenUser = ctx.user;
+
+      const user = await ctx.db.user.findUnique({
+        where: {
+          id: tokenUser.id,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          Categories: true,
+          emailVerified: true,
+        },
+      });
+
+      return user;
+    }),
+  loginUser: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(8).max(16),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          email: input.email,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          password: true,
+          emailVerified: true,
+        },
+      });
+
+      if (!user) {
+        const error = {
+          code: "EMAIL_DOESNOT_EXISTS",
+          message: "Please create account first.",
+        };
+
+        throw new Error(error.message); // Throw an error if the account does not exist
+      }
+
+      const isPasswordValid = await compare(input.password, user.password);
+
+      if (!isPasswordValid) {
+        const error = {
+          code: "INVALID_PASSWORD",
+          message: "Invalid email or password.",
+        };
+
+        throw new Error(error.message);
+      }
+
+      // if (!user.emailVerified) {
+      //   const error = {
+      //     code: "NOT_VERIFIED",
+      //     message: "Please verify your account and try again",
+      //   };
+
+      //   throw new Error(error.message);
+      // }
+
+      const tokenUser = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      };
+
+      // Generate JWT token
+      const token = jwt.sign(tokenUser, JWT_SECRET, {
+        expiresIn: JWT_EXPIRATION,
+      });
+
+      return {
+        tokenUser,
+        token,
+      };
     }),
   verifyEmail: protectedProcedure
     .input(
@@ -118,7 +205,8 @@ export const userRouter = createTRPCRouter({
         },
         select: {
           verificationCode: true,
-        }
+          emailVerified: true,
+        },
       });
 
       if (!user) {
@@ -128,6 +216,15 @@ export const userRouter = createTRPCRouter({
         };
 
         throw new Error(error.message); // Throw an error if the username is already taken
+      }
+
+      if (user.emailVerified !== null) {
+        const error = {
+          code: "ACCOUNT_ALREADY_VERIFIED",
+          message: "Account is already verified. Please continue on homepage.",
+        };
+
+        throw new Error(error.message);
       }
 
       if (user.verificationCode !== input.verificationCode) {
@@ -148,81 +245,76 @@ export const userRouter = createTRPCRouter({
 
       return {
         userVerified: true,
+        message: 'Account verified!'
       };
     }),
-  loginUser: publicProcedure
+  toggleCategory: protectedProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        password: z.string().min(8).max(16),
+        categoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const tokenUser = ctx.user;
+      const userId = tokenUser.id;
+      const categoryId = input.categoryId;
+
       const user = await ctx.db.user.findUnique({
         where: {
-          email: input.email,
+          id: userId,
         },
         select: {
-          id: true,
-          email: true,
-          name: true,
-          password: true,
           emailVerified: true,
-        }
+        },
       });
 
-      if (!user) {
-        const error = {
-          code: "EMAIL_DOESNOT_EXISTS",
-          message:
-            "Please create account first.",
-        };
-
-        throw new Error(error.message); // Throw an error if the account does not exist
-      }
-
-      // const hashedPassword = await hash(input.password, 10);
-      const isPasswordValid = await compare(input.password, user.password);
-
-      if (!isPasswordValid) {
-        const error = {
-          code: "INVALID_PASSWORD",
-          message:
-            "Invalid email or password.",
-        };
-
-        throw new Error(error.message);
-      }
-
-      if (!user.emailVerified) {
+      if (!user?.emailVerified) {
         const error = {
           code: "NOT_VERIFIED",
-          message:
-            "Please verify your account and try again",
+          message: "Please verify your account and try again",
         };
 
         throw new Error(error.message);
       }
 
-      const tokenUser = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      };
-
-      // Generate JWT token
-      const token = jwt.sign(tokenUser, JWT_SECRET, {
-        expiresIn: JWT_EXPIRATION,
+      const checkAlreadyExist = await ctx.db.user.findMany({
+        where: {
+          AND: [{ id: userId }, { Categories: { some: { id: categoryId } } }],
+        },
       });
 
-      // setCookie(null, 'token', token, {
-      //   maxAge: JWT_EXPIRATION, // 1 hour expiration
-      //   path: '/', // Cookie is accessible from all paths
-      // });
+      if (checkAlreadyExist.length === 0) {
+        await ctx.db.category.update({
+          where: { id: categoryId },
+          data: {
+            Users: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        });
 
-      return {
-        tokenUser,
-        token
-      };
+        return {
+          code: 200,
+          message: `Added category successfully`,
+        };
+      } else {
+        await ctx.db.category.update({
+          where: { id: categoryId },
+          data: {
+            Users: {
+              disconnect: {
+                id: userId,
+              },
+            },
+          },
+        });
+
+        return {
+          code: 200,
+          message: `Removed category successfully`,
+        };
+      }
     }),
 });
