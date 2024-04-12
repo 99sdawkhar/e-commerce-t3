@@ -80,7 +80,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
+    <div className="flex w-[90%] lg:w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
       <h2 className="mb-8 text-center text-2xl font-semibold">Login</h2>
       <h3 className="mb-3 text-center text-lg font-medium">
         Welcome back to ECOMMERCE
@@ -88,7 +88,7 @@ const LoginForm = () => {
       <p className="mb-5 text-center text-sm">
         The next gen business marketplace
       </p>
-      <form onSubmit={handleLogin} method="post" className="max-w-[576px]">
+      <form onSubmit={handleLogin} method="post">
         <Input
           label="Email"
           type="email"

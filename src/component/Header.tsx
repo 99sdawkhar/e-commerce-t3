@@ -20,7 +20,7 @@ const Header = () => {
   return (
     <header>
       <div className="mb-4 px-10">
-        <div className="mb-4 flex items-center justify-end gap-5">
+        <div className="mb-4 flex items-center justify-end gap-5 pt-2">
           <div className="flex gap-5">
           {isAuthenticated ? (
               <div className="flex gap-5">
@@ -54,12 +54,12 @@ const Header = () => {
           {isAuthenticated && <span>Hi, {user?.name}</span>}
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold uppercase">
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <h1 className="text-3xl font-bold uppercase mb-2">
             <Link href={ERoutes.home}>{header.logo}</Link>
           </h1>
-          <nav>
-            <ul className="flex items-center gap-5 font-semibold">
+          <nav className="mb-2">
+            <ul className="flex items-center gap-5 font-semibold flex-wrap">
               {header.nav.map((item) => (
                 <li
                   key={item.id}

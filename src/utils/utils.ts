@@ -21,7 +21,7 @@ export const generateVerificationCode = () => {
 // Function to mask email
 export const maskEmail = (email: string) => {
   const [prefix = '', suffix = ''] = email.split('@');
-  const total = prefix.length - 3
+  const total = prefix.length > 3 ? prefix.length - 3 : 0
   const maskedPrefix = prefix?.slice(0, 3) + '*'.repeat(total)
   return maskedPrefix + '@' + suffix;
 };

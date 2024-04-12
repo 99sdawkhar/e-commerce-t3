@@ -34,7 +34,7 @@ const Input = (props: IInput) => {
     extraData,
   } = props;
   return (
-    <fieldset className={cn("relative mb-6 flex max-w-[450px] flex-col", parentClass)}>
+    <fieldset className={cn("relative mb-6 flex flex-col", parentClass)}>
       {label && (
         <label htmlFor={name} className="mb-1">
           {label}

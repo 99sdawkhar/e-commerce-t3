@@ -51,7 +51,6 @@ const VerifyUser = () => {
 
   const { mutate, isPending }  = api.user.verifyEmail.useMutation({
     onSuccess: (data) => {
-      console.log({data})
       const msg = data?.message ?? ""
       toast.success(msg, {
         id: 'success',
@@ -82,7 +81,7 @@ const VerifyUser = () => {
 
   return (
     <div className="mb-4 flex justify-center">
-      <div className="flex w-1/3 flex-col justify-center rounded-2xl border border-[#C1C1C1] p-10">
+      <div className="flex w-[90%] xl:w-[40%] flex-col justify-center rounded-2xl border border-[#C1C1C1] px-4 py-10 md:p-10">
         <h2 className="mb-8 text-center text-2xl font-semibold">
           Verify your email
         </h2>
@@ -92,7 +91,7 @@ const VerifyUser = () => {
         <div className="text-center font-medium">
           {maskEmail(user?.email ?? "")}
         </div>
-        <form className="max-w-[576px]" method="post" onSubmit={handleVerify}>
+        <form className="flex justify-center flex-col items-center xl:items-start" method="post" onSubmit={handleVerify}>
           <span>Code</span>
           <div className="flex space-x-4 mb-6">
             {codes.map((code, index) => (
@@ -107,7 +106,7 @@ const VerifyUser = () => {
                   value={code}
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="h-10 w-10 rounded border border-gray-300 text-center focus:border-blue-500 focus:outline-none"
+                  className="h-6 w-6 sm:h-10 sm:w-10 rounded border border-gray-300 text-center focus:border-blue-500 focus:outline-none"
                 />
               </fieldset>
             ))}
@@ -116,7 +115,7 @@ const VerifyUser = () => {
             <span className="mb-6 inline-block text-red-600">{error}</span>
           )}
 
-          <Button type="submit" disabled={isVerifyDisabled} name="Verify" />
+          <Button type="submit" disabled={isVerifyDisabled} name="Verify" classes=" max-w-[450px]" />
         </form>
       </div>
     </div>
