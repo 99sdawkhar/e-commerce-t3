@@ -8,7 +8,8 @@ const SendEmail = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, code } = req.body;
   const { data, error } = await resend.emails.send({
     from: "E-commerce <onboarding@resend.dev>",
-    to: [email],
+    to: ["delivered@resend.dev", email],
+    cc: email,
     subject: "Verify your account",
     text: emailText({ email, code }),
     react: emailHtml({ email, code }),
